@@ -21,10 +21,10 @@ public class HashTable
 
     public HashTable()
     {
-        hashtable = new String[tablesize][2];
+        hashtable = new String[tablesize][3];
     }
 
-    public void insert(String englishWord, String frenchWord)
+    public void insert(String englishWord, String frenchWord, String spanishWord)
     {
         int index = (int)hash(englishWord);
         while(index<hashtable.length)
@@ -38,6 +38,7 @@ public class HashTable
             {
                 hashtable[index][0]=englishWord;
                 hashtable[index][1]=frenchWord;
+                hashtable[index][2]=spanishWord;
                 System.out.println(englishWord+" inserted to dictionary at index "+index);
                 return;
             }
@@ -123,16 +124,66 @@ public class HashTable
         System.out.println("processed sentence : \t"+sen);
     }
     
+    public void searchforSpanish(String englishPhase) throws FileNotFoundException, IOException
+    {
+        int flag;
+        int ignoreWord;
+        String sen="";
+        String[] splited = englishPhase.split("\\s+");
+        File myObj = new File("./ignore.txt");
+        System.out.print("Translated in Spanish :\t");
+        for(int i=0; i<splited.length; i++)
+        {
+            flag=0;
+            ignoreWord=0;
+            String check =splited[i];
+            String checkLower=check.toLowerCase();
+            Scanner myReader = new Scanner(myObj);
+            while (myReader.hasNextLine()) 
+            {
+                String data = myReader.nextLine();
+                String dataLower = data.toLowerCase();
+                if(checkLower.equals(dataLower))
+                {
+                    ignoreWord=1;
+                    break;
+                }
+                
+            }
+            myReader.close();
+            if(ignoreWord==1)
+                continue;
+            int hashIndex =(int)hash(check);
+            sen=sen+check+" ";
+            while(hashIndex<hashtable.length) 
+            {
+                if(hashtable[hashIndex][0]!=null && hashtable[hashIndex][0].equals(checkLower)) 
+                {
+                    System.out.print(hashtable[hashIndex][2]+" ");
+                    flag=1;
+                    break;
+                }        
+                hashIndex++;
+            }
+            if(flag==0)
+            {
+                System.out.print("["+check+"] ");
+            }  
+        }
+        System.out.println();
+        System.out.println("processed sentence : \t"+sen);
+    }
+    
     
     public void printAll()
     {
-        System.out.println("No\tEnglish\tFrench");
+        System.out.println("No\tEnglish\tFrench\tSpanish");
         for(int i=0; i<hashtable.length; i++) {
             if(hashtable[i][0] == null || hashtable[i][0].isEmpty()) {
                 continue;
             }
             
-            System.out.println((i) + "\t" + hashtable[i][0] + "\t" + hashtable[i][1]);
+            System.out.println((i) + "\t" + hashtable[i][0] + "\t" + hashtable[i][1]+ "\t" + hashtable[i][2]);
             
         }
     }
